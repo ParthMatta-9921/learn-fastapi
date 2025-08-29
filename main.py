@@ -1,5 +1,7 @@
 from fastapi import FastAPI
 from typing import Optional
+from pydantic import BaseModel
+import uvicorn
 # uvircorn with relaod meansd automatic reload
 app = FastAPI()# this is an instance of FastAPI
 
@@ -42,3 +44,19 @@ def get_comments(id:int,limit:int=10):
     #fetch comments for blog with id=id
     #return limit
     return {'data':"comments for blog {}".format(id), 'comments':['1','2']}
+
+class Blog(BaseModel):
+    title: str
+    content: str
+    published: Optional[bool]=None
+
+@app.post("/blog")
+def create_blog(blog:Blog):
+    #return request
+    return  {'data':f"blog is created with title as {blog.title}"}
+
+
+#if port need to be changed or some other custom shit
+#so now we can run just run the main.py and then it will just work as we are using uvicorn here instead of in th0e terminal
+'''if __name__=="__main__":
+    uvicorn.run(app,host="127.0.0.1",port=8834)  '''
