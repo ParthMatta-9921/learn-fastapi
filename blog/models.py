@@ -2,14 +2,6 @@ from database import Base
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import Integer,String,Text
 
-
-
-class Blog(Base):
-    __tablename__="blogs"
-    id:Mapped[int]=mapped_column(Integer,primary_key=True,index=True)
-    title:Mapped[str]=mapped_column(String(200),index=True) #length for varchar
-    body:Mapped[str]=mapped_column(Text)# long text
-
 #     Use index=True if you often:
 
 # Search by the column (filter(Blog.title == something))
@@ -23,3 +15,18 @@ class Blog(Base):
 # The column is rarely used in queries.
 
 # It’s just descriptive (e.g., blog body text, description).
+
+class Blog(Base):
+    __tablename__="blogs"
+    id:Mapped[int]=mapped_column(Integer,primary_key=True,index=True)
+    title:Mapped[str]=mapped_column(String(200),index=True) #length for varchar
+    body:Mapped[str]=mapped_column(Text)# long text
+
+
+
+class User(Base):
+    __tablename__="users"
+    id:Mapped[int]=mapped_column(Integer,primary_key=True,index=True)
+    username:Mapped[str]=mapped_column(String(100),index=True)
+    email:Mapped[str]=mapped_column(String(100),index=True)
+    password:Mapped[str]=mapped_column(String(100))
