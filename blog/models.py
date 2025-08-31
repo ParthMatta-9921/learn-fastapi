@@ -1,7 +1,6 @@
 from database import Base
-from sqlalchemy.orm import Mapped, mapped_column
-from sqlalchemy import Integer,String,Text
-
+from sqlalchemy.orm import Mapped, mapped_column,relationship
+from sqlalchemy import Integer,String,Text,ForeignKey
 #     Use index=True if you often:
 
 # Search by the column (filter(Blog.title == something))
@@ -22,6 +21,10 @@ class Blog(Base):
     title:Mapped[str]=mapped_column(String(200),index=True) #length for varchar
     body:Mapped[str]=mapped_column(Text)# long text
 
+    user_id:Mapped[int]=mapped_column(Integer,ForeignKey("users.id"))#creator of the blog
+
+
+    creator=relationship("User", back_populates="blogs")    
 
 
 class User(Base):
@@ -30,3 +33,5 @@ class User(Base):
     username:Mapped[str]=mapped_column(String(100),index=True)
     email:Mapped[str]=mapped_column(String(100),index=True)
     password:Mapped[str]=mapped_column(String(100))
+
+    blogs=relationship("Blog", back_populates="creator")

@@ -1,5 +1,5 @@
-from fastapi import FastAPI,Depends,status,Response,HTTPException as HTTPE
-from schemas import Blog,BlogShow,User #. means same directory .. parent directory
+from fastapi import FastAPI,Depends,status,HTTPException as HTTPE
+from schemas import Blog,BlogShow,User,ShowUser,BlogResponse #. means same directory .. parent directory
 from models import Blog as BlogModel,User as UserModel #to avoid name conflict
 from database import engine,SessionLocal
 from sqlalchemy.orm import Session
@@ -28,12 +28,12 @@ def get_db():
 
 #If you declare both a return type and a response_model, the response_model will take priority and be used by FastAPI.
 #201 for creating something
-@app.post("/blog",status_code=status.HTTP_201_CREATED)
+@app.post("/blog",status_code=status.HTTP_201_CREATED,tags=["blogs"])#tags for documentation and easy seeing shit and all
 #never do like this this sucks ass these are query parametwers so we gonna create pydfamnmtic models to make it easy
 #def create(title,body):
 #   return {"title":title,"body":body}
 def create(request:Blog,db:Session=Depends(get_db)):
-    new_blog= BlogModel(title=request.title,body=request.body)
+    new_blog= BlogModel(title=request.title,body=request.body,user_id=1)
     db.add(new_blog)
     db.commit()
     db.refresh(new_blog)
@@ -41,7 +41,7 @@ def create(request:Blog,db:Session=Depends(get_db)):
 
 
 
-@app.delete("/blog/{blog_id}",status_code=status.HTTP_204_NO_CONTENT)
+@app.delete("/blog/{blog_id}",status_code=status.HTTP_204_NO_CONTENT,tags=["blogs"])
 def delete_blog(blog_id:int,db:Session=Depends(get_db)):
     blog=db.query(BlogModel).filter(BlogModel.id==blog_id).first()
     #blog=db.query(BlogModel).filter(BlogModel.id==blog_id).delete(synchronize_session=False) #so no need for db.delete()
@@ -54,7 +54,7 @@ def delete_blog(blog_id:int,db:Session=Depends(get_db)):
 
 
 # update means you have to update all of it, there will be a patch too or partial update i hope so otherwise i will do it
-@app.put("/blog/{blog_id}",status_code=status.HTTP_200_OK)
+@app.put("/blog/{blog_id}",status_code=status.HTTP_200_OK,tags=["blogs"])
 def update_blog(blog_id:int,request:Blog,db:Session=Depends(get_db)):# Blog is from schemas
     #up_blog=db.query(BlogModel).filter(BlogModel.id==blog_id).first()
     up_blog=db.query(BlogModel).filter(BlogModel.id==blog_id).first()
@@ -73,29 +73,46 @@ def update_blog(blog_id:int,request:Blog,db:Session=Depends(get_db)):# Blog is f
 
 
 
-@app.get("/blog",response_model=List[BlogShow])# all the blogs coming towards me/client
+@app.get("/blog",response_model=List[BlogResponse],tags=["blogs"],status_code=status.HTTP_200_OK)# all the blogs coming towards me/client
 def get_all_blogs(db:Session=Depends(get_db)):
     blogs = db.query(BlogModel).all()
     return blogs
 
 #blogshow is schema 
-@app.get("/blog/{blog_id}",status_code=status.HTTP_200_OK,response_model=BlogShow)#1 blog will be there for me/client
-def get_blog(blog_id:int,response : Response, db:Session=Depends(get_db)):
+@app.get("/blog/{blog_id}",status_code=status.HTTP_200_OK,response_model=BlogShow,tags=["blogs"])#1 blog will be there for me/client
+def get_blog(blog_id:int, db:Session=Depends(get_db)):
     blog = db.query(BlogModel).filter(BlogModel.id==blog_id).first()#filter is basically where clause
     if not blog:
         raise HTTPE(status_code=status.HTTP_404_NOT_FOUND,detail=f"blog with id {blog_id} not found")
-    
+    # response:Response in the parameters of the get_blog was used for this
         #response.status_code = status.HTTP_404_NOT_FOUND
         #return {"detail": f"Blog with id {blog_id} not found"}
     return blog
 
 
 
-@app.post("/user")
+@app.post("/user",response_model=ShowUser,tags=["Users"])
 def create_user(request: User,db:Session=Depends(get_db)):
 
-    new_user=UserModel(username=request.username,email=request.email,password=Hash.encrypt(request.password))#have to manually assign or some bullshit **request.dict()
+    new_user=UserModel(username=request.username,
+                       email=request.email,
+                       password=Hash.encrypt(request.password))
+    #have to manually assign or use some bullshit **request.dict()
     db.add(new_user)
     db.commit()
     db.refresh(new_user)#means we can see the db has new data that is deposited
     return new_user
+
+
+@app.get("/user/{user_id}",response_model=ShowUser,tags=["Users"])
+def get_user(user_id: int, db: Session=Depends(get_db)):
+    user=db.query(UserModel).filter(UserModel.id==user_id).first()
+    if not user:
+        raise HTTPE(status_code=status.HTTP_404_NOT_FOUND,detail=f"user with id {user_id} not found")
+    return user
+# # Convert ORM objects to Pydantic models
+#     user_data = ShowUser(
+#         username=user.username,
+#         email=user.email, # from_orm converts orm objects into pydantic models like Blog
+#         blogs=[Blog.from_orm(blog) for blog in user.blogs]  # Convert blogs to Pydantic models
+#     )
