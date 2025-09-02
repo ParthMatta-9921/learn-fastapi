@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Optional,List
+from typing import List
 
 # these are pydamtic models and the models in models.py are database models
 
@@ -27,7 +27,11 @@ class ShowUser(BaseModel):
     class Config(): # for converting to orm object to json
         from_attributes = True
 
-
+class UserResponse(BaseModel):
+    username: str
+    email: str
+    class Config(): # for converting to orm object to json
+        from_attributes = True
 
 
 # class BlogUpdate(BaseModel):
@@ -38,7 +42,7 @@ class BlogShow(BaseModel):
     # i only need title and body to be shown in show get method so it willuse from parent blog
     title: str
     body: str
-    creator: ShowUser
+    creator: UserResponse
     class Config(): # for converting to orm object to json
         from_attributes = True
 
