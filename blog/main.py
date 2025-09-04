@@ -2,7 +2,7 @@ from fastapi import FastAPI
 #. means same directory .. parent directory
 from models import Base
 from database import engine
-from routers import blog,user
+from routers import blog,user,auth
 app = FastAPI()# this is an instance of FastAPI
 #needs to be a pydantic field type or model
 #Blog is for schemas and used for requests to communicate between client and server/front end to back end
@@ -27,6 +27,7 @@ Base.metadata.create_all(bind=engine)#creates the table in the database and only
 app.title="My FastAPI Application-Blog Bitches"  
 app.include_router(blog.router)
 app.include_router(user.router)
+app.include_router(auth.router)
 
 
 

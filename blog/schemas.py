@@ -1,7 +1,7 @@
 from pydantic import BaseModel
-from typing import List
+from typing import List,Optional
 
-# these are pydamtic models and the models in models.py are database models
+# these are pydantic models and the models in models.py are database models
 
 class Blog(BaseModel):
     title: str
@@ -12,7 +12,7 @@ class BlogResponse(BaseModel):
     title: str
     body: str
     class Config(): # for converting to orm object to json
-        #OR USED FOR ONLY MAKING THE SHEMAS SHIT TAKE FROM THE DB AND NOT THE WHOLE DB ROW
+        #OR USED FOR ONLY MAKING THE SCHEMAS SHIT TAKE FROM THE DB AND NOT THE WHOLE DB ROW
         from_attributes = True
 class User(BaseModel):
     username: str
@@ -47,3 +47,17 @@ class BlogShow(BaseModel):
         from_attributes = True
 
 
+class Login(BaseModel):
+    username: str
+    password: str       
+
+
+
+#Tokens bitches
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str 
+
+class TokenData(BaseModel):
+    username: Optional[str] = None
