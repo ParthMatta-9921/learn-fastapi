@@ -15,12 +15,17 @@ def get_id_repo(db :Session,blog_id:int):
         #response.status_code = status.HTTP_404_NOT_FOUND
         #return {"detail": f"Blog with id {blog_id} not found"}
     return blog
-def create_repo(db:Session,request: Blog):
-    new_blog= BlogModel(title=request.title,body=request.body,user_id=1)#id is hard coded right now need to change
+
+
+
+def create_repo(db:Session,request: Blog,user_id: int):
+    new_blog= BlogModel(title=request.title,body=request.body,user_id=user_id)#id is hard coded right now need to change
     db.add(new_blog)
     db.commit()
     db.refresh(new_blog)
     return new_blog
+
+
 
 def delete_repo(db:Session,blog_id:int):
     blog=db.query(BlogModel).filter(BlogModel.id==blog_id).first()

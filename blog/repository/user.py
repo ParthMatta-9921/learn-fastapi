@@ -25,3 +25,11 @@ def get_user_repo(db: Session, user_id: int):
 #         email=user.email, # from_orm converts orm objects into pydantic models like Blog
 #         blogs=[Blog.from_orm(blog) for blog in user.blogs]  # Convert blogs to Pydantic models
 #     )
+
+
+#no need anymore bitch cause i used explicit type as user from models so i can get id easly from the database
+# def get_user_id(db:Session,username: str):
+#     user_id=db.query(UserModel).filter(UserModel.username==username).first()
+#     if not user_id:
+#         raise HTTPE(status_code=status.HTTP_404_NOT_FOUND,detail=f"user with username {username} not found")
+#     return user_id.id

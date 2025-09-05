@@ -35,4 +35,3 @@ class User(Base):
     password:Mapped[str]=mapped_column(String(100))
 
     blogs=relationship("Blog", back_populates="creator")
-
